@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
 import os
+import random
 import requests
 
 
@@ -9,6 +10,14 @@ def get_filename(file):
 
 
 def get_latest_comic(url='https://xkcd.com/info.0.json'):
+    response = requests.get(url)
+    if response.ok:
+        return response.json().get('num')
+
+
+def get_random_comic(comic_number=1):
+    random_comic = random.randint(1, comic_number)
+    url = f'http://xkcd.com/{random_comic}/info.0.json'
     response = requests.get(url)
     if response.ok:
         return response.json()
@@ -32,6 +41,8 @@ def get_comic_description(comic_data):
 
 
 if __name__ == "__main__":
-    comic = get_latest_comic()
-    image = download_comic_image(comic)
-    print(get_comic_description(comic))
+    latest_comic = get_latest_comic()
+    random_comic = get_random_comic(latest_comic)
+
+    image = download_comic_image(random_comic)
+    print(get_comic_description(random_comic))
