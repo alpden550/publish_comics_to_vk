@@ -31,6 +31,7 @@ def get_comic_description(comic_data):
     return comic_data.get('alt')
 
 
-comic = get_latest_comic()
-image = download_comic_image(comic)
-print(get_comic_description(comic))
+if __name__ == "__main__":
+    comic = get_latest_comic()
+    image = download_comic_image(comic)
+    print(get_comic_description(comic))
