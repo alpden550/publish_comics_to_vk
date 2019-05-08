@@ -60,10 +60,11 @@ def wall_post(photo_data, group_id, message):
 
 
 if __name__ == "__main__":
-    comic = download_comics.get_latest_comic()
-    comic_image = download_comics.download_comic_image(comic)
-    comic_name = download_comics.get_filename(comic.get('img'))
-    comic_description = download_comics.get_comic_description(comic)
+    latest_comic = download_comics.get_latest_comic()
+    random_comic = download_comics.get_random_comic(latest_comic)
+    comic_image = download_comics.download_comic_image(random_comic)
+    comic_name = download_comics.get_filename(random_comic.get('img'))
+    comic_description = download_comics.get_comic_description(random_comic)
 
     upload_url = get_url_from_upload_photo(group_id=GROUP_ID)
     photo_raw_data = upload_photo(upload_url, photo=f'comics/{comic_name}')
@@ -72,3 +73,4 @@ if __name__ == "__main__":
     wall_post(photo_data=photo_id,
               group_id=GROUP_ID,
               message=comic_description)
+    os.remove(f'comics/{comic_name}')
