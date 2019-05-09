@@ -32,9 +32,10 @@ def get_url_from_upload_photo():
         'access_token': ACCESS_TOKEN,
         'v': API_VERSION,
     }
-    response = requests.get(url, params=parameters)
-    if response.ok:
-        return response.json().get('response').get('upload_url')
+    response = requests.get(url, params=parameters).json()
+    if 'error' in response:
+        raise requests.HTTPError(response['error'])
+    return response.get('response').get('upload_url')
 
 
 def upload_photo(upload_url, photo):
@@ -76,11 +77,14 @@ if __name__ == "__main__":
     comic_name = download_comics.get_filename(random_comic.get('img'))
     comic_description = download_comics.get_comic_description(random_comic)
 
-    upload_url = get_url_from_upload_photo()
+    try:
+        upload_url = get_url_from_upload_photo()
+    except requests.HTTPError:
+        upload_url = None
+
     try:
         photo_raw_data = upload_photo(upload_url, photo=f'comics/{comic_name}')
-    except FileNotFoundError as error:
-        print(error)
+    except FileNotFoundError:
         photo_raw_data = None
     if photo_raw_data is not None:
         photo_id = save_wall_photo(photo_data=photo_raw_data)
