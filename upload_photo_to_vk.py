@@ -64,7 +64,6 @@ if __name__ == "__main__":
     random_comic = download_comics.get_random_comic(latest_comic)
     comic_image = download_comics.download_comic_image(random_comic)
     comic_name = download_comics.get_filename(random_comic.get('img'))
-    print(f'Downloding {comic_name} from xkcd.com.')
     comic_description = download_comics.get_comic_description(random_comic)
 
     upload_url = get_url_from_upload_photo(group_id=GROUP_ID)
@@ -74,6 +73,5 @@ if __name__ == "__main__":
     wall_post(photo_data=photo_id,
               group_id=GROUP_ID,
               message=comic_description)
-    print(f'Upload {comic_name} to VK group.')
+
     os.remove(f'comics/{comic_name}')
-    print(f'Remove image.')
