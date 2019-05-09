@@ -15,8 +15,8 @@ The list of permissions must be: `scope=photos,groups,photos,wall,offline`
 Create file .env in the root and write in it:
 
 ```.env
+group_id=id your vk group
 access_token=your access token from VK
-
 ```
 
 Python3 must be already installed.

@@ -8,7 +8,7 @@ load_dotenv()
 VK_URL = 'https://api.vk.com/method/{}'
 API_VERSION = 5.95
 ACCESS_TOKEN = os.getenv('access_token')
-GROUP_ID = 182098076
+GROUP_ID = os.getenv('group_id')
 
 
 def get_url_from_upload_photo(group_id):
