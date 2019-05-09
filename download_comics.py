@@ -4,12 +4,15 @@ import random
 import requests
 
 
+LATEST_COMIC = 'https://xkcd.com/info.0.json'
+
+
 def get_filename(file):
     path = urlparse(file)
     return path.path.split('/')[-1]
 
 
-def get_latest_comic(url='https://xkcd.com/info.0.json'):
+def get_latest_comic(url=LATEST_COMIC):
     response = requests.get(url)
     if response.ok:
         return response.json().get('num')
@@ -45,4 +48,3 @@ if __name__ == "__main__":
     random_comic = get_random_comic(latest_comic)
 
     image = download_comic_image(random_comic)
-    print(get_comic_description(random_comic))
