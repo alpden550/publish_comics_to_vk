@@ -8,7 +8,19 @@ load_dotenv()
 VK_URL = 'https://api.vk.com/method/{}'
 API_VERSION = 5.95
 ACCESS_TOKEN = os.getenv('access_token')
-GROUP_ID = int(os.getenv('group_id'))
+GROUP_ID = -int(os.getenv('group_id'))
+
+
+def put_to_vk(method, **kwargs):
+    url = VK_URL.format(method)
+    parameters = {
+        'access_token': ACCESS_TOKEN,
+        'v': API_VERSION,
+    }
+    parameters.update(kwargs)
+    response = requests.post(url, data=parameters)
+
+    return response
 
 
 def get_url_from_upload_photo(group_id):
@@ -31,32 +43,25 @@ def upload_photo(upload_url, photo):
         return response.json()
 
 
-def save_wall_photo(photo_data, group_id):
-    url = VK_URL.format('photos.saveWallPhoto')
-    parameters = {
-        'access_token': ACCESS_TOKEN,
-        'v': API_VERSION,
-        'photo': photo_data.get('photo'),
-        'server': photo_data.get('server'),
-        'hash': photo_data.get('hash'),
-    }
-    response = requests.post(url, data=parameters).json().get('response')[0]
-    owner_id, media_id = response.get('owner_id'), response.get('id')
+def save_wall_photo(photo_data, method='photos.saveWallPhoto'):
+    vk_photo = photo_data.get('photo')
+    vk_server = photo_data.get('server')
+    vk_hash = photo_data.get('hash')
+    response = put_to_vk(method, photo=vk_photo, server=vk_server, hash=vk_hash)
+
+    photo_data = response.json().get('response')[0]
+    owner_id, media_id = photo_data.get('owner_id'), photo_data.get('id')
     return owner_id, media_id
 
 
-def wall_post(photo_data, group_id, message):
+def wall_post(photo_data, group_id, message, method='wall.post'):
     photo_owner_id, media_id = photo_data
-    url = VK_URL.format('wall.post')
-    parameters = {
-        'access_token': ACCESS_TOKEN,
-        'v': API_VERSION,
-        'owner_id': -group_id,
-        'from_group': 1,
-        'message': message,
-        'attachments': f'photo{photo_owner_id}_{media_id}',
-    }
-    requests.post(url, data=parameters)
+
+    put_to_vk('wall.post',
+              owner_id=group_id,
+              from_group=-1,
+              message=message,
+              attachments=f'photo{photo_owner_id}_{media_id}')
 
 
 if __name__ == "__main__":
@@ -68,8 +73,7 @@ if __name__ == "__main__":
 
     upload_url = get_url_from_upload_photo(group_id=GROUP_ID)
     photo_raw_data = upload_photo(upload_url, photo=f'comics/{comic_name}')
-    photo_id = save_wall_photo(photo_data=photo_raw_data,
-                               group_id=GROUP_ID)
+    photo_id = save_wall_photo(photo_data=photo_raw_data)
     wall_post(photo_data=photo_id,
               group_id=GROUP_ID,
               message=comic_description)
